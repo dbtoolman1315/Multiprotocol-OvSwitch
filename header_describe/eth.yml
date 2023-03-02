@@ -1,0 +1,9 @@
+Ethernet :
+   dstAddr :
+     size : 48
+
+   srcAddr :
+     size : 48
+    
+   etherType :
+     size : 16

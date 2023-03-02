@@ -1,0 +1,1 @@
+{"Ethernet": {"dstAddr": {"size": 48, "offset": 0}, "srcAddr": {"size": 48, "offset": 6}, "etherType": {"size": 16, "offset": 12}}}{"Ethernet": {"dstAddr": {"size": 48}, "srcAddr": {"size": 48}, "etherType": {"size": 16}}}
