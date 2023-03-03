@@ -116,3 +116,83 @@ struct eth_addr {
 
 2.自定义的头，这就需要Python代码生成，首先判断字节数，如果超出了最大的类型，就需要定义结构体类型。如果没有超过就去查找sHeaderStruct字符串然后替换相应的字符，再输出到flow.c中。
 
+生成的代码存放在flow.c 以及header.c中
+
+存在的问题
+
+1.字节对齐问题.（非常重要）
+
+2.重复协议问题.
+
+## 生成Parser以及miniflow
+
+需要仿照解析eth的函数生成
+
+```c
+{
+    /* Link layer. */
+    //判断长度是不是定义的eth数据类型的长度
+    ASSERT_SEQUENTIAL(dl_dst, dl_src);
+
+    //需要特别生成
+    miniflow_push_macs(mf, dl_dst, data);
+
+    /* VLAN */
+    union flow_vlan_hdr vlans[FLOW_MAX_VLAN_HEADERS];
+    size_t num_vlans = parse_vlan(&data, &size, vlans);
+
+    dl_type = parse_ethertype(&data, &size);
+    miniflow_push_be16(mf, dl_type, dl_type);
+    miniflow_pad_to_64(mf, dl_type);
+    if (num_vlans > 0) {
+        miniflow_push_words_32(mf, vlans, vlans, num_vlans);
+    }
+
+ }
+```
+
+如果自定义协议是Myself，就要生成对应的miniflow_push_Myselfs函数
+
+```c
+#define miniflow_push_macs(MF, FIELD, VALUEP)                       \
+    miniflow_push_macs_(MF, offsetof(struct flow, FIELD), VALUEP)
+    
+#define miniflow_push_macs_(MF, OFS, VALUEP)                    \
+{                                                               \
+    miniflow_set_maps(MF, (OFS) / 8, 2);                        \
+    memcpy(MF.data, (VALUEP), 2 * ETH_ADDR_LEN);                \
+    MF.data += 1;                   /* First word only. */      \
+}
+```
+
+Myself_parser函数需要data_pull()函数的调用，不知道解析出的数据存在了哪了？ miniflow里边？
+
+```c
+ovs_be16 proto;
+
+proto = *(ovs_be16 *) data_pull(datap, sizep, sizeof proto);
+    
+static inline const void *
+data_pull(const void **datap, size_t *sizep, size_t size)
+{
+    const char *data = *datap;
+    *datap = data + size;
+    *sizep -= size;
+    return data;
+}
+```
+
+```c
+void *vpMyselfParser         (const void **datap, size_t *sizep)
+{
+    miniflow_push_myselfs(mf, ji, data);
+    data_pull(datap, sizep,6+2);
+
+    uint8 ucyang = *(uint8 *)data_pull(datap,sizep,1);
+    miniflow_push_be16(mf, yang, yang);
+
+    //pad
+    miniflow_pad_to_64(mf, dl_type);
+    return &ucyang
+}
+```
