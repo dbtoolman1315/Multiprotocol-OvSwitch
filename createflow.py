@@ -28,8 +28,11 @@ ovs_be16 ct_tp_src;\n\
 ovs_be16 ct_tp_dst;\n\
 ovs_be32 igmp_group_ip4;\n'
 
+#存在协议对应的字符串
 dExistName = {'eth':EthFlow, 'ipv4':Ipv4Flow, 'ipv6':Ipv6Flow, 'tcp':TcpUdpStcpFlow,'udp':TcpUdpStcpFlow,'icmp':TcpUdpStcpFlow}
 
+
+#长度超出的创建结构体
 def creatheader(num, name):
     sHeaderStruct ='struct XXX       {\n\
         union {\n\
@@ -37,6 +40,7 @@ def creatheader(num, name):
             ovs_be16 be16[sssize];\n \
         };\n\
     };\n'
+    #找位置，替换字符串，先转换成list，因为str不可修改
     locationName = sHeaderStruct.find('XXX')
     sname = 'st' + str(name)
     namesize = len(sname)
@@ -79,15 +83,18 @@ def creatheader(num, name):
 
 #main
 def vCreateFlow(dHead,name):
+    #已存在协议
     if(name != None):
         file_path = 'flow.c'
         stwrite = dExistName[name]
+        #ip需要特殊处理一下
         if name == 'ipv4' or name == 'ipv6':
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
                 file_obj.write('     ' + stwrite + IpHelpFlow)
         else:
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
                 file_obj.write('     ' + stwrite )
+    #新协议
     else:
         dSizeToType = {8 : 'uint8_t', 16 :'ovs_be16', 32 : 'ovs_be32'}                
         file_path = 'flow.c'
@@ -98,13 +105,13 @@ def vCreateFlow(dHead,name):
             for key1,size in val.items():
                 if(size in dSizeToType.keys()):
                     with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                        file_obj.write('     ' + dSizeToType[size] + '  ' + key + ',\n')
+                        file_obj.write('     ' + dSizeToType[size] + '  ' + key + ';\n')
                     #print(dSizeToType[size] + '  ' + key + ',\n')
                 else :
                     sname = creatheader(size,key)
                     swrite = 'struct  ' + sname +'  ' + key
                     with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                        file_obj.write('     ' + swrite + ',\n')
+                        file_obj.write('     ' + swrite + ';\n')
         #with open(file_path, mode='a', encoding='utf-8') as file_obj:
         #               file_obj.write('\n')
 

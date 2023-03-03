@@ -27,7 +27,6 @@ uint8_t nw_frag;
     uint8_t nw_tos;
     uint8_t nw_ttl;
     uint8_t nw_proto;
-     struct  stji  ji,
-     ovs_be16  zhao,
-     uint8_t  yang,
-};
+     struct  stji  ji;
+     ovs_be16  zhao;
+     uint8_t  yang;
