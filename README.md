@@ -196,3 +196,33 @@ void *vpMyselfParser         (const void **datap, size_t *sizep)
     return &ucyang
 }
 ```
+
+```
+1、问题描述:
+在我们pull代码时，有时候会意外的在vim上出现如下提示（其实就是pull失败了）
+
+“ Your branch and 'origin/master' have diverged,
+
+(use "git pull" to merge the remote branch into yours)
+
+nothing to commit, working tree clean ”
+
+问题翻译过来其实就是合并产生了一些冲突，不过这个冲突不是由于代码错误引起的，所以不必过于纠结。
+
+2、解决办法：
+遇到这个问题，有两种方法：
+
+方法一：
+
+$ git fetch origin
+
+$ git reset --hard origin/master
+
+这样做就是让你本地滚会最初更改前的状态，可以解决问题，但非常不值得推荐使用。试想如果你本地更改了很多代码，回滚过之后你之前做的那些事情全部清空，代价太高。
+
+方法二：（推荐）
+
+将光标放到在vim框的末尾，然后在键盘上 按下 Shift + z z 就可以了。执行完后界面如下：
+
+```
+

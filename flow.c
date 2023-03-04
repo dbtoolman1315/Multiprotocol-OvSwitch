@@ -19,14 +19,7 @@ struct flow{
      struct eth_addr dl_dst; 
      struct eth_addr dl_src;
      ovs_be16 dl_type;
-     ovs_be32 nw_src;
-     ovs_be32 nw_dst;
-     ovs_be32 ct_nw_src;
-    ovs_be32 ct_nw_dst;
-uint8_t nw_frag;
-    uint8_t nw_tos;
-    uint8_t nw_ttl;
-    uint8_t nw_proto;
      struct  stji  ji;
      ovs_be16  zhao;
      uint8_t  yang;
+};
