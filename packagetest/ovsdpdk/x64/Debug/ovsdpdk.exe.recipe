@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\学习\SDN\T4P4S\yamltest\packagetest\ovsdpdk\x64\Debug\ovsdpdk.exe</FullPath>
+      <FullPath>E:\学习\SDN\T4P4S\Multiprotocol-OvSwitch\packagetest\ovsdpdk\x64\Debug\ovsdpdk.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

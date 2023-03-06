@@ -31,13 +31,14 @@ struct stji {
 
 struct flow {
  
-    struct eth_addr dl_dst;
+    /*struct eth_addr dl_dst;
     struct eth_addr dl_src;
     ovs_be16 dl_type;
+    uint8_t pad1[2];*/
     struct  stji  ji;
     ovs_be16  zhao;
     uint8_t  yang;
-    uint8_t pad[2];
+    uint8_t pad2[2];
 };
 #define DIV_ROUND_UP(X, Y) (((X) + ((Y) - 1)) / (Y))
 #define MAP_1 (map_t)1

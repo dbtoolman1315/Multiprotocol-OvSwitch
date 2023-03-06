@@ -102,7 +102,7 @@ void* vpMyselfParser(const void* datap, uint32_t* sizep, struct mf_ctx mf)
 
 }
 
-uint8 packet[] = {1,2,3,4,5,6,7,8,9,10,11,12,13};
+uint8 packet[] = {1,2,3,4,5,6,7,8,9};
 void extract()
 {
     struct {
@@ -117,7 +117,7 @@ void extract()
     struct mf_ctx mf = { FLOWMAP_EMPTY_INITIALIZER, values,
                          values + FLOW_U64S };
 
-    vpMyselfParser(data, size, mf);
+    vpMyselfParser(data, &size, mf);
 }
 
 
