@@ -1,3 +1,0 @@
-﻿  flow.c
-E:\学习\SDN\T4P4S\Multiprotocol-OvSwitch\packagetest\ovsdpdk\flow.c(103): warning C4716: “vpMyselfParser”: 必须返回一个值
-  ovsdpdk.vcxproj -> E:\学习\SDN\T4P4S\Multiprotocol-OvSwitch\packagetest\ovsdpdk\x64\Debug\ovsdpdk.exe
