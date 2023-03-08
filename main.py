@@ -29,7 +29,7 @@ for la in aLayer:
                     json_str=json.dumps(Li_result)
                     print(Li_result)
                     createflow.vCreateFlow(Li_result,None)
-                    #createparser.vCreateParser(Li_result,None)
+                    createparser.vCreateParser(Li_result,None)
 
 
 createflow.vFlowEnd()

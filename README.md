@@ -227,3 +227,140 @@ $ git reset --hard origin/master
 ```
 
 ## 增加了Parser以及相关的调试
+
+```c
+/*对于自己生成的flow，进行配套的Parser*/
+struct flow {
+ 
+    /*struct eth_addr dl_dst;
+    struct eth_addr dl_src;
+    ovs_be16 dl_type;
+    uint8_t pad1[2];*/
+    struct  stji  ji;
+    ovs_be16  zhao;
+    uint8_t  yang;
+    uint8_t pad2[2];
+};
+```
+
+```c
+struct flowmap {
+    map_t bits[FLOWMAP_UNITS];
+};
+
+struct mf_ctx {
+    struct flowmap map;
+    uint64_t* data;
+    uint64_t* const end;
+};
+
+
+struct miniflow {
+    struct flowmap map;
+    /* Followed by:
+     *     uint64_t values[n];
+     * where 'n' is miniflow_n_values(miniflow). */
+};
+flowmap_set(struct flowmap* fm, size_t idx, unsigned int n_bits)
+{
+    map_t n_bits_mask = (MAP_1 << n_bits) - 1;
+    size_t unit = idx / MAP_T_BITS;
+
+    idx %= MAP_T_BITS;
+
+    fm->bits[unit] |= n_bits_mask << idx;
+    /* The seemingly unnecessary bounds check on 'unit' is a workaround for a
+     * false-positive array out of bounds error by GCC 4.9. */
+    if (unit + 1 < FLOWMAP_UNITS && idx + n_bits > MAP_T_BITS) {
+        /* 'MAP_T_BITS - idx' bits were set on 'unit', set the remaining
+         * bits from the next unit. */
+        fm->bits[unit + 1] |= n_bits_mask >> (MAP_T_BITS - idx);
+    }
+}
+
+#define miniflow_set_map(MF, OFS)            \
+    {                                        \
+    flowmap_set(&MF.map, (OFS), 1);          \
+}
+
+#define miniflow_set_maps(MF, OFS, N_WORDS)                     \
+{                                                               \
+    size_t ofs = (OFS);                                         \
+    size_t n_words = (N_WORDS);                                 \
+                                                                \
+    flowmap_set(&MF.map, ofs, n_words);                         \
+}
+
+#define miniflow_push_myself_(MF, OFS, VALUEP)                    \
+{                                                               \
+    miniflow_set_maps(MF, (OFS) / 8, 2);                        \
+    memcpy(MF.data, (VALUEP), 6+2);                \
+    MF.data += 1;                   /* First word only. */      \
+}
+#define miniflow_push_myselfs(MF, FIELD, VALUEP)                       \
+    miniflow_push_myself_(MF, offsetof(struct flow, FIELD), VALUEP)
+
+/*Python生成的Parser*/
+void* vpMyselfParser(const void* datap, uint32_t* sizep, struct mf_ctx mf)
+{
+
+    miniflow_push_myselfs(mf, ji, datap);
+    data_pull(datap, sizep, 6 + 2);
+
+    uint8_t ucyang = *(uint8_t*)data_pull(&datap, sizep, 1);
+}
+
+/*构建一串bit流 命名为packet*/
+uint8 packet[] = {1,2,3,4,5,6,7,8,9};
+void extract()
+{
+    /*填充m 以及mf*/
+    struct {
+        struct miniflow mf;
+        uint64_t buf[FLOW_U64S];
+    } m;
+
+    const void* data = packet;
+    uint32_t size = sizeof(packet);
+
+    uint64_t* values = miniflow_values(&m.mf);
+    struct mf_ctx mf = { FLOWMAP_EMPTY_INITIALIZER, values,
+                         values + FLOW_U64S };
+	//调用Python生成的Parser
+    vpMyselfParser(data, &size, mf);
+}
+```
+
+### 最后的结果
+
+<img src="E:\学习\SDN\T4P4S\Multiprotocol-OvSwitch\picture\1.png" style="zoom:150%;" />
+
+### 生成的Parser如下所示
+
+```c
+#define miniflow_push_myself_(MF, OFS, VALUEP)                    \ 
+{                                                               \ 
+    miniflow_set_maps(MF, (OFS) / 8, 1);                        \ 
+     memcpy(MF.data, (VALUEP), 8);                \ 
+    MF.data += 1;                   /* First word only. */      \ 
+} 
+#define miniflow_push_myselfs(MF, FIELD, VALUEP)                       \  
+    miniflow_push_myself_(MF, offsetof(struct flow, FIELD), VALUEP)
+
+
+uint8_t vpMyselfParser    (const void **datap, size_t *sizep)
+{
+    miniflow_push_myselfs     (mf, ji,     data);
+    data_pull(datap, sizep, 6    );
+    data_pull(datap, sizep, 2    );
+
+    yang = *(uint8_t  *)data_pull(datap,sizep,1);
+    miniflow_push_be16(mf, yang, yang);
+
+    //pad
+    miniflow_pad_to_64(mf, dl_type);
+    return yang
+}
+
+```
+
