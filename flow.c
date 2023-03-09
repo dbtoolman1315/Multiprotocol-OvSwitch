@@ -19,7 +19,9 @@ struct flow{
      struct eth_addr dl_dst; 
      struct eth_addr dl_src;
      ovs_be16 dl_type;
+     uint8_t pad1[2];
      struct  stji  ji;
      ovs_be16  zhao;
      uint8_t  yang;
+     uint8_t pad4[7];
 };
