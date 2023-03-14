@@ -1,0 +1,14 @@
+ip3 :
+  ip3_dst : 
+    size : 16
+  ip3_src : 
+    size : 16
+  ip3_info1 : 
+    size : 8
+  ip3_info2 : 
+    size : 8
+  ip3_type : 
+    size : 16
+  Type : 
+    ip2_TYPE_tp1 : '0xa0'
+    ip2_TYPE_tp2 : '0xa1'  

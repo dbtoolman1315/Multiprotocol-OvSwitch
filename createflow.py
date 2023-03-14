@@ -101,6 +101,7 @@ def vCreateFlow(dHead, name):
         else:
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
                 file_obj.write('     ' + stwrite)
+        return 
     #新协议
     else:
         dSizeToType = {8: 'uint8_t', 16: 'ovs_be16', 32: 'ovs_be32'}
@@ -108,7 +109,8 @@ def vCreateFlow(dHead, name):
         file_path = 'flow.c'
         for key, val in dHead.items():
             dHeadVal = val
-
+        if('Type' in val.keys()):
+            val.pop('Type')
         for key, val in dHeadVal.items():
             for key1, size in val.items():
                 padsize += size
@@ -133,6 +135,8 @@ def vCreateFlow(dHead, name):
 
                     file_obj.write('     ' + dSizeToType[8] + ' pad' + str(pad) + '[' + str(inx) + ']' + ';\n')
             pad += 1
+
+        return padsize
         #with open(file_path, mode='a', encoding='utf-8') as file_obj:
         #               file_obj.write('\n')
 

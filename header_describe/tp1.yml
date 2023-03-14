@@ -1,0 +1,12 @@
+tp1 :
+  tp1_dst : 
+    size : 16
+  tp1_src : 
+    size : 16
+  tp1_info2 : 
+    size : 16
+  tp1_type : 
+    size : 16
+  tp1_info1 : 
+    size : 8
+    

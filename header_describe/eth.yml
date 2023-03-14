@@ -1,9 +1,13 @@
 Ethernet :
-   dstAddr :
+   eth_dst :
      size : 48
 
-   srcAddr :
+   eth_src :
      size : 48
     
-   etherType :
+   eth_type :
      size : 16
+   
+   Type :
+     ETH_TYPE_ip2 : '0xbbaa'
+     ETH_TYPE_ip3 : '0x9200'
