@@ -1,6 +1,7 @@
 Layer2 : 
   - eth
-Layer3 : 
+Layer3 :
+  - ipv6
   - myself
 Layer4 :
   - null

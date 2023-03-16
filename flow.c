@@ -20,6 +20,12 @@ struct flow{
      struct eth_addr dl_src;
      ovs_be16 dl_type;
      uint8_t pad1[2];
+     struct in6_addr ipv6_src;
+    struct in6_addr ipv6_dst;
+    struct in6_addr ct_ipv6_src;
+    struct in6_addr ct_ipv6_dst;
+    ovs_be32 ipv6_label;
+    struct in6_addr nd_target;
      struct  stji  ji;
      ovs_be16  zhao;
      uint8_t  yang;

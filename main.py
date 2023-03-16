@@ -13,6 +13,7 @@ aLayer = ['Layer2', 'Layer3', 'Layer4', 'Layer5']
 aExistHeader = ['eth','ipv4','ipv6','tcp','udp','tcmp']
 
 createflow.vFlowInit()
+createparser.vParserInit()
 for la in aLayer:
     Layeri = result[la]
     for name in Layeri:
@@ -20,6 +21,7 @@ for la in aLayer:
             #存在的协议直接copy
             if(name in aExistHeader):
                 createflow.vCreateFlow(None,name)
+                createparser.vCreateParser(None,name)
             #新的协议再去生成
             else:
                 newname = './header_describe/' + name + '.yml'
@@ -33,6 +35,5 @@ for la in aLayer:
 
 
 createflow.vFlowEnd()
- 
 
 
