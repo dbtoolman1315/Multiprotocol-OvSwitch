@@ -40,7 +40,7 @@ def Ttype_get(dHead,name,Ttype,Ttype_size):
 
 
 def defineinit(Ttype):
-    with open('./extract.c', 'w', encoding='utf-8') as fo:
+    with open('./cfile/extract.c', 'w', encoding='utf-8') as fo:
         for key,value in Ttype.items():
             if (value != None):
                 for key_, value_ in value.items():
@@ -77,7 +77,7 @@ def iteration (typename, dtype, Ttype,Ttype_size,fo,cnt):
 
 def create_extract(Ttype,Ttype_size):
     start = 'eth_type'
-    fo = open('./extract.c', 'a', encoding='utf-8')
+    fo = open('./cfile/extract.c', 'a', encoding='utf-8')
     defineinit(Ttype)
     extract_init(fo)
     iteration (start, Ttype[start].items(),Ttype,Ttype_size,fo,1)    

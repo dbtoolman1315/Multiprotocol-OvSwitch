@@ -12,3 +12,7 @@ ip3 :
   Type : 
     ip2_TYPE_tp1 : '0xa0'
     ip2_TYPE_tp2 : '0xa1'  
+
+  Hash :
+  - ip3_dst
+  - ip3_type

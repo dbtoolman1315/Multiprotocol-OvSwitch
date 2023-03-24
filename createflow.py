@@ -79,7 +79,7 @@ def creatheader(num, name):
             sHeaderStruct[i + locationName] = sname[i]
     sHeaderStruct = ''.join(sHeaderStruct)
     #sHeaderStruct = str(sHeaderStruct)
-    file_path = 'header.c'
+    file_path = './cfile/header.c'
     with open(file_path, mode='a', encoding='utf-8') as file_obj:
         file_obj.write(sHeaderStruct)
     print(sHeaderStruct)
@@ -92,7 +92,7 @@ def vCreateFlow(dHead, name):
     global pad
     #已存在协议
     if name is not None:
-        file_path = 'flow.c'
+        file_path = './cfile/flow.c'
         stwrite = dExistName[name]
         #ip需要特殊处理一下
         if name == 'ipv4':
@@ -106,11 +106,15 @@ def vCreateFlow(dHead, name):
     else:
         dSizeToType = {8: 'uint8_t', 16: 'ovs_be16', 32: 'ovs_be32'}
         padsize = 0
-        file_path = 'flow.c'
+        file_path = './cfile/flow.c'
         for key, val in dHead.items():
             dHeadVal = val
+
         if('Type' in val.keys()):
             val.pop('Type')
+        if('Hash' in val.keys()):
+            val.pop('Hash')
+
         for key, val in dHeadVal.items():
             for key1, size in val.items():
                 padsize += size
@@ -163,14 +167,14 @@ def vFlowInit():
         uint32_t conj_id;\n \
         ofp_port_t actset_output; \n'
 
-    file_path = 'flow.c'
+    file_path = './cfile/flow.c'
     with open(file_path, mode='w', encoding='utf-8') as file_obj:
         file_obj.write(sFirstLine)
 
-    with open(r'header.c','a+',encoding='utf-8') as test:
-        test.truncate(0)
+    with open('./cfile/header.c', mode='w', encoding='utf-8') as test:
+        test.write('include "header.h"\n\n')
 
 def vFlowEnd():
-    file_path = 'flow.c'
+    file_path = './cfile/flow.c'
     with open(file_path, mode='a', encoding='utf-8') as file_obj:
                     file_obj.write('};\n')
