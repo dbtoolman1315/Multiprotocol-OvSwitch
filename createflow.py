@@ -3,7 +3,8 @@ dEth = {'Ethernet': {'dstAddr': {'size': 48}, 'srcAddr': {'size': 48}, 'etherTyp
 
 EthFlow = 'struct eth_addr dl_dst; \n \
     struct eth_addr dl_src;\n \
-    ovs_be16 dl_type;\n'
+    ovs_be16 dl_type;\n \
+    uint8_t pad1[2];\n'
 
 Ipv4Flow = 'ovs_be32 nw_src;\n \
     ovs_be32 nw_dst;\n \
@@ -17,22 +18,27 @@ Ipv6Flow = 'struct in6_addr ipv6_src;\n\
     ovs_be32 ipv6_label;\n\
     struct in6_addr nd_target;\n'
 
-IpHelpFlow = 'uint8_t nw_frag;\n\
+Ipv4HelpFlow = 'uint8_t nw_frag;\n\
     uint8_t nw_tos;\n\
     uint8_t nw_ttl;\n\
-    uint8_t nw_proto;\n'
+    uint8_t nw_proto;\n\
+    ovs_be32 pad2;\n'
+
 
 TcpUdpStcpFlow = 'ovs_be16 tp_src;\n\
-ovs_be16 tp_dst;\n\
-ovs_be16 ct_tp_src;\n\
-ovs_be16 ct_tp_dst;\n\
-ovs_be32 igmp_group_ip4;\n'
+    ovs_be16 tp_dst;\n\
+    ovs_be16 ct_tp_src;\n\
+    ovs_be16 ct_tp_dst;\n\
+    ovs_be32 igmp_group_ip4;\n\
+    ovs_be32 pad3;\n'
 
-#存在协议对应的字符串
-dExistName = {'eth':EthFlow, 'ipv4':Ipv4Flow, 'ipv6':Ipv6Flow, 'tcp':TcpUdpStcpFlow,'udp':TcpUdpStcpFlow,'icmp':TcpUdpStcpFlow}
+# 填充计数
+pad = 4
+# 存在协议对应的字符串
+dExistName = {'eth': EthFlow, 'ipv4': Ipv4Flow, 'ipv6': Ipv6Flow, 'tcp': TcpUdpStcpFlow, 'udp': TcpUdpStcpFlow,
+              'icmp': TcpUdpStcpFlow}
 
-
-#长度超出的创建结构体
+# 长度超出的创建结构体
 def creatheader(num, name):
     sHeaderStruct ='struct XXX       {\n\
         union {\n\
@@ -48,7 +54,7 @@ def creatheader(num, name):
     loaction2 = sHeaderStruct.find('sssize]')
     #print(loaction1)
     sHeaderStruct = list(sHeaderStruct)
-    
+
     num = (num / 8)
     num = int(num)
     snum = str(num)
@@ -82,45 +88,60 @@ def creatheader(num, name):
 
 
 #main
-def vCreateFlow(dHead,name):
+def vCreateFlow(dHead, name):
+    global pad
     #已存在协议
-    if(name != None):
+    if name is not None:
         file_path = 'flow.c'
         stwrite = dExistName[name]
         #ip需要特殊处理一下
-        if name == 'ipv4' or name == 'ipv6':
+        if name == 'ipv4':
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                file_obj.write('     ' + stwrite + IpHelpFlow)
+                file_obj.write('     ' + stwrite + '     ' + Ipv4HelpFlow)
         else:
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                file_obj.write('     ' + stwrite )
+                file_obj.write('     ' + stwrite)
     #新协议
     else:
-        dSizeToType = {8 : 'uint8_t', 16 :'ovs_be16', 32 : 'ovs_be32'}                
+        dSizeToType = {8: 'uint8_t', 16: 'ovs_be16', 32: 'ovs_be32'}
+        padsize = 0
         file_path = 'flow.c'
-        for key,val in dHead.items():
+        for key, val in dHead.items():
             dHeadVal = val
 
         for key, val in dHeadVal.items():
-            for key1,size in val.items():
-                if(size in dSizeToType.keys()):
+            for key1, size in val.items():
+                padsize += size
+                if size in dSizeToType.keys():
                     with open(file_path, mode='a', encoding='utf-8') as file_obj:
                         file_obj.write('     ' + dSizeToType[size] + '  ' + key + ';\n')
                     #print(dSizeToType[size] + '  ' + key + ',\n')
-                else :
+                else:
                     sname = creatheader(size,key)
                     swrite = 'struct  ' + sname +'  ' + key
                     with open(file_path, mode='a', encoding='utf-8') as file_obj:
                         file_obj.write('     ' + swrite + ';\n')
+        # 填充到64bit
+        if padsize % 64:
+            inx = 64 - padsize % 64
+            if inx in dSizeToType:
+                with open(file_path, mode='a', encoding='utf-8') as file_obj:
+                    file_obj.write('     ' + dSizeToType[inx] + ' pad' + str(pad) + ';\n')
+            else:
+                with open(file_path, mode='a', encoding='utf-8') as file_obj:
+                    inx = inx // 8
+
+                    file_obj.write('     ' + dSizeToType[8] + ' pad' + str(pad) + '[' + str(inx) + ']' + ';\n')
+            pad += 1
         #with open(file_path, mode='a', encoding='utf-8') as file_obj:
         #               file_obj.write('\n')
 
-    
+
 
 
 
 def vFlowInit():
-    sFirstLine = 'struct flow{ \n \
+    sFirstLine = 'struct flow_mof{ \n \
         struct flow_tnl tunnel;\n \
         ovs_be64 metadata;\n \
         uint32_t regs[FLOW_N_REGS];\n \
