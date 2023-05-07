@@ -141,7 +141,7 @@ def vCreateFlow(dHead, name):
 
 
 def vFlowInit():
-    sFirstLine = 'struct flow{ \n \
+    sFirstLine = 'struct flow_mof{ \n \
         struct flow_tnl tunnel;\n \
         ovs_be64 metadata;\n \
         uint32_t regs[FLOW_N_REGS];\n \

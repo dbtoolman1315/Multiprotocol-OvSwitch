@@ -2,7 +2,7 @@ import createflow
 import math
 
 parse_mpls = 'static inline int\n\
-parse_mpls(const void **datap, size_t *sizep)\n\
+parse_mpls_mof(const void **datap, size_t *sizep)\n\
 {\n\
     const struct mpls_hdr *mh;\n\
     int count = 0;\n\
@@ -17,7 +17,7 @@ parse_mpls(const void **datap, size_t *sizep)\n\
 }\n'
 
 parse_vlan = 'static inline ALWAYS_INLINE size_t\n\
-parse_vlan(const void **datap, size_t *sizep, union flow_vlan_hdr *vlan_hdrs)\n\
+parse_vlan_mof(const void **datap, size_t *sizep, union flow_vlan_hdr *vlan_hdrs)\n\
 {\n\
     const ovs_be16 *eth_type;\n\
 \n\
@@ -41,7 +41,7 @@ parse_vlan(const void **datap, size_t *sizep, union flow_vlan_hdr *vlan_hdrs)\n\
 }\n'
 
 parse_eth = 'static inline ALWAYS_INLINE ovs_be16\n\
-parse_ethertype(const void **datap, size_t *sizep)\n\
+parse_ethertype_mof(const void **datap, size_t *sizep)\n\
 {\n\
     const struct llc_snap_header *llc;\n\
     ovs_be16 proto;\n\
@@ -74,7 +74,7 @@ parse_ethertype(const void **datap, size_t *sizep)\n\
 }\n\
 \n\
 bool\n\
-parse_nsh(const void **datap, size_t *sizep, struct ovs_key_nsh *key)\n\
+parse_nsh_mof(const void **datap, size_t *sizep, struct ovs_key_nsh *key)\n\
 {\n\
     const struct nsh_hdr *nsh = (const struct nsh_hdr *) *datap;\n\
     uint8_t version, length, flags, ttl;\n\
@@ -127,7 +127,7 @@ parse_nsh(const void **datap, size_t *sizep, struct ovs_key_nsh *key)\n\
 }\n'
 
 parse_icmpv6 = 'static inline bool\n\
-parse_icmpv6(const void **datap, size_t *sizep,\n\
+parse_icmpv6_mof(const void **datap, size_t *sizep,\n\
              const struct icmp6_data_header *icmp6,\n\
              ovs_be32 *rso_flags, const struct in6_addr **nd_target,\n\
              struct eth_addr arp_buf[2], uint8_t *opt_type)\n\
@@ -196,7 +196,7 @@ invalid:\n\
 }\n'
 
 parse_ip = 'static inline bool\n\
-parse_ipv6_ext_hdrs__(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
+parse_ipv6_ext_hdrs___mof(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
                       uint8_t *nw_frag,\n\
                       const struct ovs_16aligned_ip6_frag **frag_hdr)\n\
 {\n\
@@ -255,7 +255,7 @@ parse_ipv6_ext_hdrs__(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
 }\n\
 \n\
 bool\n\
-parse_ipv6_ext_hdrs(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
+parse_ipv6_ext_hdrs_mof(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
                     uint8_t *nw_frag,\n\
                     const struct ovs_16aligned_ip6_frag **frag_hdr)\n\
 {\n\
@@ -264,7 +264,7 @@ parse_ipv6_ext_hdrs(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
 }\n\
 \n\
 static inline bool\n\
-ipv4_sanity_check(const struct ip_header *nh, size_t size,\n\
+ipv4_sanity_check_mof(const struct ip_header *nh, size_t size,\n\
                   int *ip_lenp, uint16_t *tot_lenp)\n\
 {\n\
     int ip_len;\n\
@@ -295,7 +295,7 @@ ipv4_sanity_check(const struct ip_header *nh, size_t size,\n\
 }\n\
 \n\
 static inline uint8_t\n\
-ipv4_get_nw_frag(const struct ip_header *nh)\n\
+ipv4_get_nw_frag_mof(const struct ip_header *nh)\n\
 {\n\
     uint8_t nw_frag = 0;\n\
 \n\
@@ -310,7 +310,7 @@ ipv4_get_nw_frag(const struct ip_header *nh)\n\
 }\n\
 \n\
 static inline bool\n\
-ipv6_sanity_check(const struct ovs_16aligned_ip6_hdr *nh, size_t size)\n\
+ipv6_sanity_check_mof(const struct ovs_16aligned_ip6_hdr *nh, size_t size)\n\
 {\n\
     uint16_t plen;\n\
 \n\
@@ -334,7 +334,7 @@ ipv6_sanity_check(const struct ovs_16aligned_ip6_hdr *nh, size_t size)\n\
 }\n\
 \n\
 static void\n\
-dump_invalid_packet(struct dp_packet *packet, const char *reason)\n\
+dump_invalid_packet_mof(struct dp_packet *packet, const char *reason)\n\
 {\n\
     static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(1, 5);\n\
     struct ds ds = DS_EMPTY_INITIALIZER;\n\
