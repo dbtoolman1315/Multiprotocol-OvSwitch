@@ -1,6 +1,5 @@
 #通过main.yml中的每层的头的名称找到对应的文件
 import yaml
-import json
 import createflow
 import createparser
 import createmfext
@@ -12,7 +11,7 @@ print(result)
 
 aLayer = ['Layer2', 'Layer3', 'Layer4', 'Layer5']
 #判断是否为存在的协议
-aExistHeader = ['eth','ipv4','ipv6','tcp','udp','tcmp']
+aExistHeader = ['ipv4','ipv6','tcp','udp','tcmp']
 Ttype = {}
 Ttype_size = {}
 
@@ -34,7 +33,6 @@ for la in aLayer:
                 print(newname)
                 with open(newname,'r', encoding = 'utf-8') as f:
                     Li_result = yaml.load(f.read(), Loader=yaml.FullLoader)
-                    json_str=json.dumps(Li_result)
                     print(Li_result)
                     padsize = createflow.vCreateFlow(Li_result,None)
                     createparser.vCreateParser(Li_result,None,padsize)    

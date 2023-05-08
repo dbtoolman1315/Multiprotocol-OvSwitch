@@ -1,15 +1,12 @@
 #include "flow.h"
 #include "string.h"
-//#include "printf.h"
-//#include <stddef.h>
+#include "printf.h"
+#include <stddef.h>
 
 #define size_t uint32_t
 #define ETH_ADDR_LEN 6
 #define MINIFLOW_ASSERT(X)
 #define OVS_FORCE
-#define offsetof(type, member) \
-    ((size_t)((char *)&(((type *)0)->member) - (char *)0))
-
 
 #define miniflow_set_map(MF, OFS)               \
     {                                           \
@@ -173,7 +170,10 @@ flowmap_is_set(const struct flowmap *fm, size_t idx)
         }                         \
     }
 
+#define offsetof(type, member) \
+    ((size_t)((char *)&(((type *)0)->member) - (char *)0))
 
+#define offsetof(TYPE, MEMBER) __builtin_offsetof(TYPE, MEMBER)
 
 #define miniflow_set_map(MF, OFS)       \
     {                                   \
@@ -309,7 +309,6 @@ void miniflow_extract(void *packet, struct miniflow *dst)
                         values + FLOW_U64S};
 
     ovs_be16 dl_type = parser_eth(&data, &size, &mf);
-
     if (dl_type == DL_TYPE_IP2)
     {
         uint8_t ip2_type = parser_ip2(&data, &size, &mf);
@@ -327,5 +326,5 @@ void miniflow_extract(void *packet, struct miniflow *dst)
         uint16_t ip3_type = parser_ip3(&data, &size, &mf);
     }
 
-   // printf("%s", "\na debug info");
+    printf("%s", "\na debug info");
 }

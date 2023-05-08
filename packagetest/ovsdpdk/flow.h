@@ -24,7 +24,7 @@ struct ovs_st24
     union
     {
         uint8_t eb[3];
-    };
+    }
 };
 
 struct eth_addr

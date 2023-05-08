@@ -8,9 +8,11 @@
 Layer2 : 
   - eth
 Layer3 : 
-  - ip
+  - ip2
+  - ip3
 Layer4 :
-  - myself
+  - tp1
+  - tp2
 Layer5 :
   - null
 #定义Layer 每层的协议根据选择填写
@@ -21,18 +23,26 @@ Layer5 :
 ### eth.yml
 
 ```yaml
-Ethernet :
-  - dstAddr :
-    - size : 48
-    - offset : 0
+ip2 :
+  ip2_dst : 
+    size : 32
+  ip2_src : 
+    size : 32
+  ip2_info1 : 
+    size : 8
+  ip2_type : 
+    size : 8 
+  ip2_info2 : 
+    size : 16
+  ip2_info3 : 
+    size : 24
+  Type : 
+    ip2_TYPE_tp1 : '0xa0'
+    ip2_TYPE_tp2 : '0xa1'
 
-  - srcAddr :
-    - size : 48
-    - offset : 6
-    
-  - etherType :
-    - size : 16
-    - offset : 12
+  Hash :
+    - ip2_dst
+    - ip2_src
 ```
 
 ![](E:\学习\SDN\T4P4S\yaml\图片\4.png)
@@ -363,4 +373,95 @@ uint8_t vpMyselfParser    (const void **datap, size_t *sizep)
 }
 
 ```
+
+## 生成Hash
+
+![](E:\work\SDN\T4P4S\Multiprotocol-OvSwitch\picture\2.png)
+
+添加Hash字段，内容是已经定义的头。
+
+得到的c代码
+
+![](E:\work\SDN\T4P4S\Multiprotocol-OvSwitch\picture\3.png)
+
+
+
+## 看代码得到的想法
+
+### 1.利用日志
+
+![](E:\work\SDN\T4P4S\Multiprotocol-OvSwitch\picture\4.png)
+
+### 2.移植Python生成的代码并且正确编译运行
+
+比如flow是贯穿整个代码的部分，没有完全修改完与之相关的代码时（如1,2,3级匹配）flow里的内容不可动，但是可以增加一个flow_a，与flow是平行的关系。由于没有修改原有的内容，所以可以正确的编译，还需要相应的增加与flow寻址相关的宏定义，但修改的内容大大的减少了。
+
+```c
+struct flow_mof
+{
+    /* L3 */
+    ovs_be32 ip2_dst;//3
+    ovs_be32 ip2_src;
+    uint8_t ip2_info1;//4
+    uint8_t ip2_type;
+    ovs_be16 ip2_info2;
+    struct ovs_st24 ip2_info3;
+    uint8_t pad2;
+
+    ovs_be16 ip3_dst;//5
+    ovs_be16 ip3_src;
+    uint8_t ip3_info1;
+    uint8_t ip3_info2;
+    ovs_be16 ip3_type;
+
+    /* L4 */
+    ovs_be16 tp1_dst;//6
+    ovs_be16 tp1_src;
+    ovs_be16 tp1_info2;
+    ovs_be16 tp1_type;
+    uint8_t tp1_info1;//7
+    uint8_t pad3[7];
+
+    uint8_t tp2_dst;//8
+    uint8_t tp2_src;
+    ovs_be16 tp2_info2;
+    ovs_be32 tp2_info1;
+    ovs_be16 tp2_type;//9
+    uint8_t pad4[6];
+};
+
+```
+
+内容是除了metadata以及eth的头
+
+
+
+```c
+#define FLOW_MOF_U64S (sizeof(struct flow_mof) / sizeof(uint64_t))
+
+
+#define miniflow_push_uint8_mof(MF, FIELD, VALUE) \
+    miniflow_push_uint8_(MF, offsetof(struct flow_mof, FIELD), VALUE)
+
+#define miniflow_push_be16_mof(MF, FIELD, VALUE) \
+    miniflow_push_be16_(MF, offsetof(struct flow_mof, FIELD), VALUE)
+
+#define miniflow_push_be32_mof(MF, FIELD, VALUE) \
+    miniflow_push_be32_(MF, offsetof(struct flow_mof, FIELD), VALUE)    
+
+#define miniflow_pad_to_64_mof(MF, FIELD) \
+    miniflow_pad_to_64_(MF, OFFSETOFEND(struct flow_mof, FIELD))
+```
+
+同样的一级匹配，在不破坏原有结构的基础上，加上自己的一级匹配，进行包的output，完成一级匹配，可通过日志进行验证。
+
+![](E:\work\SDN\T4P4S\Multiprotocol-OvSwitch\picture\9.png)
+
+### 3.收发包的软件
+
+如果想要测试自己的自定义协议，需要同样协议的包。但是目前的发包软件只有正常的网络包，解决方法目前有两个
+
+1.将正常的网络包收进来，在匹配前，将mac后的内存改为自己协议的比特流，优点是可以测试自己的自定义协议包，方便调试，缺点是不能多个包测试，只能每次在代码里手动修改地址。
+
+2.自己编写发包的软件
 

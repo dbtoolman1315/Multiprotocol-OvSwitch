@@ -351,20 +351,20 @@ dump_invalid_packet(struct dp_packet *packet, const char *reason)\n\
     ds_destroy(&ds);\n\
 }\n'
 
-parser_names = {'mpls': parse_mpls, 'vlan': parse_vlan, 'eth': parse_eth, 'ipv4': parse_ip,
+parser_names = {'mpls': parse_mpls, 'vlan': parse_vlan,  'ipv4': parse_ip,
                 'ipv6': parse_ip, 'icmpv6': parse_icmpv6}
 #endliiu
 sparsername = 'size_t parser_name(void **datap, uint32_t *sizep, struct mf_ctx *mfp)\n\
 { \n'
 
-sfunname = '    miniflow_push_stype((*mfp), filedname, *(ltype *)data_pull(datap, sizep, sizeof(ltype)));\n\n'
+sfunname = '    miniflow_push_stype_mof((*mfp), filedname, *(ltype *)data_pull(datap, sizep, sizeof(ltype)));\n\n'
 
-sfunnamestruct = '    miniflow_push_uint8((*mfp), fieldname.eb[cnt], *(uint8_t *)data_pull(datap, sizep, sizeof(uint8_t)));\n'
+sfunnamestruct = '    miniflow_push_uint8_mof((*mfp), fieldname.eb[cnt], *(uint8_t *)data_pull(datap, sizep, sizeof(uint8_t)));\n'
 
 stypename = '    size_t rtype = *(size_t *)data_pull(datap, sizep, sizeof(size_t));\n\
-    miniflow_push_size_s((*mfp), fieldname, rtype);\n\n'
+    miniflow_push_size_s_mof((*mfp), fieldname, rtype);\n\n'
 
-spadname = '    miniflow_pad_to_64((*mfp), fieldname);\n\n'
+spadname = '    miniflow_pad_to_64_mof((*mfp), fieldname);\n\n'
 
 slast = '    return rtype;\n\
 }\n'
@@ -457,4 +457,4 @@ def vParserInit():
     #先打开parser.c
     file_path = './cfile/parser.c'
     with open(file_path, mode='w', encoding='utf-8') as file_obj:
-            file_obj.write('include "parser.h\n\n\n"')
+            file_obj.write(' ')

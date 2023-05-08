@@ -1,14 +1,14 @@
 
 
-sHash = '    hash = hash_add(hash, MINIFLOW_GET_TYPE(flow, fieldname));\n'
+sHash = '    hash = hash_add(hash, MINIFLOW_GET_TYPE_MOF(flow, fieldname));\n'
 
 sHeader = 'uint32_t miniflow_hash()\n\
 {\n\
 	uint32_t hash = 0;\n\
-	hash = hash_add(hash, MINIFLOW_GET_U32(flow, dl_dst));\n\
-	hash = hash_add(hash, MINIFLOW_GET_U16(flow, (dl_dst<< 16)));\n\n\
-	hash = hash_add(hash, MINIFLOW_GET_U32(flow, dl_src));\n\
-	hash = hash_add(hash, MINIFLOW_GET_U16(flow, (dl_src << 16)));\n'
+	hash = hash_add(hash, MINIFLOW_GET_U32_MOF(flow, dl_dst));\n\
+	hash = hash_add(hash, MINIFLOW_GET_U16_MOF(flow, (dl_dst<< 16)));\n\n\
+	hash = hash_add(hash, MINIFLOW_GET_U32_MOF(flow, dl_src));\n\
+	hash = hash_add(hash, MINIFLOW_GET_U16_MOF(flow, (dl_src << 16)));\n'
 
 sTail = '    return hash_finish(hash, 42);\n\
 }\n\n'

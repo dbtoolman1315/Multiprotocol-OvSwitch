@@ -149,30 +149,15 @@ def vCreateFlow(dHead, name):
 
 
 def vFlowInit():
-    sFirstLine = 'struct flow{ \n \
-        struct flow_tnl tunnel;\n \
-        ovs_be64 metadata;\n \
-        uint32_t regs[FLOW_N_REGS];\n \
-        uint32_t skb_priority;\n \
-        uint32_t pkt_mark;\n \
-        uint32_t dp_hash;\n\n \
-        union flow_in_port in_port;\n \
-        uint32_t recirc_id;\n \
-        uint8_t ct_state;\n \
-        uint8_t ct_nw_proto;\n \
-        uint16_t ct_zone;\n \
-        uint32_t ct_mark;\n \
-        ovs_be32 packet_type;\n \
-        ovs_u128 ct_label;\n \
-        uint32_t conj_id;\n \
-        ofp_port_t actset_output; \n'
+    sFirstLine = 'struct flow_mof{ \n \
+        uint8_t pad[751];\n'
 
     file_path = './cfile/flow.c'
     with open(file_path, mode='w', encoding='utf-8') as file_obj:
         file_obj.write(sFirstLine)
 
     with open('./cfile/header.c', mode='w', encoding='utf-8') as test:
-        test.write('include "header.h"\n\n')
+        test.write(' ')
 
 def vFlowEnd():
     file_path = './cfile/flow.c'
