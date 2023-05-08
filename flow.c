@@ -1,4 +1,4 @@
-struct flow{ 
+struct flow_mof{ 
          struct flow_tnl tunnel;
          ovs_be64 metadata;
          uint32_t regs[FLOW_N_REGS];
@@ -29,5 +29,6 @@ struct flow{
      struct  stji  ji;
      ovs_be16  zhao;
      uint8_t  yang;
-     uint8_t pad4[7];
+     uint8_t pad_Myself[7];
+     ovs_be64 pad[3];
 };

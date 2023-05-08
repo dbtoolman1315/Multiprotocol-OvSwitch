@@ -24,7 +24,6 @@ Ipv4HelpFlow = 'uint8_t nw_frag;\n\
     uint8_t nw_proto;\n\
     ovs_be32 pad2;\n'
 
-
 TcpUdpStcpFlow = 'ovs_be16 tp_src;\n\
     ovs_be16 tp_dst;\n\
     ovs_be16 ct_tp_src;\n\
@@ -32,11 +31,14 @@ TcpUdpStcpFlow = 'ovs_be16 tp_src;\n\
     ovs_be32 igmp_group_ip4;\n\
     ovs_be32 pad3;\n'
 
-# 填充计数
-pad = 4
+# 填充计数。bits初值为metadata比特数,flow_len为原flow比特总长度
+pad, bits = 4, 0
+flow_len = 1024
+
 # 存在协议对应的字符串
 dExistName = {'eth': EthFlow, 'ipv4': Ipv4Flow, 'ipv6': Ipv6Flow, 'tcp': TcpUdpStcpFlow, 'udp': TcpUdpStcpFlow,
               'icmp': TcpUdpStcpFlow}
+dExistName_len = {'eth': 128, 'ipv4': 192, 'ipv6': 576, 'tcp': 128, 'udp': 128, 'icmp': 128}
 
 # 长度超出的创建结构体
 def creatheader(num, name):
@@ -89,11 +91,12 @@ def creatheader(num, name):
 
 #main
 def vCreateFlow(dHead, name):
-    global pad
+    global pad, bits
     #已存在协议
     if name is not None:
         file_path = 'flow.c'
         stwrite = dExistName[name]
+        bits += int(dExistName_len[name])
         #ip需要特殊处理一下
         if name == 'ipv4':
             with open(file_path, mode='a', encoding='utf-8') as file_obj:
@@ -105,10 +108,11 @@ def vCreateFlow(dHead, name):
     else:
         dSizeToType = {8: 'uint8_t', 16: 'ovs_be16', 32: 'ovs_be32'}
         padsize = 0
+        dHeadname = []
         file_path = 'flow.c'
         for key, val in dHead.items():
             dHeadVal = val
-
+            dHeadname.append(key)
         for key, val in dHeadVal.items():
             for key1, size in val.items():
                 padsize += size
@@ -122,19 +126,22 @@ def vCreateFlow(dHead, name):
                     with open(file_path, mode='a', encoding='utf-8') as file_obj:
                         file_obj.write('     ' + swrite + ';\n')
         # 填充到64bit
+        bits += padsize
         if padsize % 64:
             inx = 64 - padsize % 64
+            bits += inx
             if inx in dSizeToType:
                 with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                    file_obj.write('     ' + dSizeToType[inx] + ' pad' + str(pad) + ';\n')
+                    file_obj.write('     ' + dSizeToType[inx] + ' pad_' + dHeadname[-1] + ';\n')
             else:
                 with open(file_path, mode='a', encoding='utf-8') as file_obj:
                     inx = inx // 8
 
-                    file_obj.write('     ' + dSizeToType[8] + ' pad' + str(pad) + '[' + str(inx) + ']' + ';\n')
+                    file_obj.write('     ' + dSizeToType[8] + ' pad_' + dHeadname[-1] + '[' + str(inx) + ']' + ';\n')
             pad += 1
         #with open(file_path, mode='a', encoding='utf-8') as file_obj:
         #               file_obj.write('\n')
+
 
 
 
@@ -168,5 +175,7 @@ def vFlowInit():
 
 def vFlowEnd():
     file_path = 'flow.c'
+    # print(bits)
     with open(file_path, mode='a', encoding='utf-8') as file_obj:
-                    file_obj.write('};\n')
+        # 填充flow_mof长度与flow一致
+        file_obj.write('     ' + 'ovs_be64' + ' pad' + '[' + str((flow_len - bits) // 64) + ']' + ';\n' + '};\n')

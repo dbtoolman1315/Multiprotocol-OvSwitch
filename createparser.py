@@ -259,7 +259,7 @@ parse_ipv6_ext_hdrs_mof(const void **datap, size_t *sizep, uint8_t *nw_proto,\n\
                     uint8_t *nw_frag,\n\
                     const struct ovs_16aligned_ip6_frag **frag_hdr)\n\
 {\n\
-    return parse_ipv6_ext_hdrs__(datap, sizep, nw_proto, nw_frag,\n\
+    return parse_ipv6_ext_hdrs___mof(datap, sizep, nw_proto, nw_frag,\n\
                                  frag_hdr);\n\
 }\n\
 \n\

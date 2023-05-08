@@ -1,5 +1,5 @@
 static inline ALWAYS_INLINE ovs_be16
-parse_ethertype(const void **datap, size_t *sizep)
+parse_ethertype_mof(const void **datap, size_t *sizep)
 {
     const struct llc_snap_header *llc;
     ovs_be16 proto;
@@ -32,7 +32,7 @@ parse_ethertype(const void **datap, size_t *sizep)
 }
 
 bool
-parse_nsh(const void **datap, size_t *sizep, struct ovs_key_nsh *key)
+parse_nsh_mof(const void **datap, size_t *sizep, struct ovs_key_nsh *key)
 {
     const struct nsh_hdr *nsh = (const struct nsh_hdr *) *datap;
     uint8_t version, length, flags, ttl;
@@ -84,7 +84,7 @@ parse_nsh(const void **datap, size_t *sizep, struct ovs_key_nsh *key)
     return true;
 }
 static inline bool
-parse_ipv6_ext_hdrs__(const void **datap, size_t *sizep, uint8_t *nw_proto,
+parse_ipv6_ext_hdrs___mof(const void **datap, size_t *sizep, uint8_t *nw_proto,
                       uint8_t *nw_frag,
                       const struct ovs_16aligned_ip6_frag **frag_hdr)
 {
@@ -143,16 +143,16 @@ parse_ipv6_ext_hdrs__(const void **datap, size_t *sizep, uint8_t *nw_proto,
 }
 
 bool
-parse_ipv6_ext_hdrs(const void **datap, size_t *sizep, uint8_t *nw_proto,
+parse_ipv6_ext_hdrs_mof(const void **datap, size_t *sizep, uint8_t *nw_proto,
                     uint8_t *nw_frag,
                     const struct ovs_16aligned_ip6_frag **frag_hdr)
 {
-    return parse_ipv6_ext_hdrs__(datap, sizep, nw_proto, nw_frag,
+    return parse_ipv6_ext_hdrs___mof(datap, sizep, nw_proto, nw_frag,
                                  frag_hdr);
 }
 
 static inline bool
-ipv4_sanity_check(const struct ip_header *nh, size_t size,
+ipv4_sanity_check_mof(const struct ip_header *nh, size_t size,
                   int *ip_lenp, uint16_t *tot_lenp)
 {
     int ip_len;
@@ -183,7 +183,7 @@ ipv4_sanity_check(const struct ip_header *nh, size_t size,
 }
 
 static inline uint8_t
-ipv4_get_nw_frag(const struct ip_header *nh)
+ipv4_get_nw_frag_mof(const struct ip_header *nh)
 {
     uint8_t nw_frag = 0;
 
@@ -198,7 +198,7 @@ ipv4_get_nw_frag(const struct ip_header *nh)
 }
 
 static inline bool
-ipv6_sanity_check(const struct ovs_16aligned_ip6_hdr *nh, size_t size)
+ipv6_sanity_check_mof(const struct ovs_16aligned_ip6_hdr *nh, size_t size)
 {
     uint16_t plen;
 
@@ -222,7 +222,7 @@ ipv6_sanity_check(const struct ovs_16aligned_ip6_hdr *nh, size_t size)
 }
 
 static void
-dump_invalid_packet(struct dp_packet *packet, const char *reason)
+dump_invalid_packet_mof(struct dp_packet *packet, const char *reason)
 {
     static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(1, 5);
     struct ds ds = DS_EMPTY_INITIALIZER;
