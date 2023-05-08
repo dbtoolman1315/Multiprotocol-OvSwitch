@@ -32,8 +32,7 @@ TcpUdpStcpFlow = 'ovs_be16 tp_src;\n\
     ovs_be32 pad3;\n'
 
 # 填充计数。bits初值为metadata比特数,flow_len为原flow比特总长度
-pad, bits = 4, 0
-flow_len = 1024
+bits, flow_len = 0, 1024
 
 # 存在协议对应的字符串
 dExistName = {'eth': EthFlow, 'ipv4': Ipv4Flow, 'ipv6': Ipv6Flow, 'tcp': TcpUdpStcpFlow, 'udp': TcpUdpStcpFlow,
@@ -91,7 +90,7 @@ def creatheader(num, name):
 
 #main
 def vCreateFlow(dHead, name):
-    global pad, bits
+    global bits
     #已存在协议
     if name is not None:
         file_path = 'flow.c'
@@ -138,7 +137,6 @@ def vCreateFlow(dHead, name):
                     inx = inx // 8
 
                     file_obj.write('     ' + dSizeToType[8] + ' pad_' + dHeadname[-1] + '[' + str(inx) + ']' + ';\n')
-            pad += 1
         #with open(file_path, mode='a', encoding='utf-8') as file_obj:
         #               file_obj.write('\n')
 
